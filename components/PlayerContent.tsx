@@ -1,10 +1,11 @@
 "use client";
 
-import useSound from "use-sound";
-import { useEffect, useState } from "react";
+// import useSound from 'use-sound';
+import { useEffect, useState, useRef } from "react";
 import { BsPauseFill, BsPlayFill } from "react-icons/bs";
 import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
 import { AiFillStepBackward, AiFillStepForward } from "react-icons/ai";
+import AudioPlayer from 'react-audio-player';
 
 import { Song } from "@/types";
 import usePlayer from "@/hooks/usePlayer";
@@ -31,7 +32,11 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
   const Icon = isPlaying ? BsPauseFill : BsPlayFill;
   const VolumeIcon = volume === 0 ? HiSpeakerXMark : HiSpeakerWave;
 
+  const audioRef = useRef(null);
+  const [audio, setAudio] = useState(new Audio(songUrl));
+
   const onPlayNext = () => {
+     handlePlay()
     if (player.ids.length === 0) {
       return;
     }
@@ -47,6 +52,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
   }
 
   const onPlayPrevious = () => {
+    handlePlay()
     if (player.ids.length === 0) {
       return;
     }
@@ -60,37 +66,52 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
 
     player.setId(previousSong);
   }
+//start
 
-  const [play, { pause, sound }] = useSound(
-    songUrl,
-    { 
-      volume: volume,
-      onplay: () => setIsPlaying(true),
-      onend: () => {
-        setIsPlaying(false);
-        onPlayNext();
-      },
-      onpause: () => setIsPlaying(false),
-      format: ['mp3']
-    }
-  );
+  // const [play, { pause, sound }] = useSound(
+  //   songUrl,
+  //   { 
+  //     volume: volume,
+  //     onplay: () => setIsPlaying(true),
+  //     onend: () => {
+  //       setIsPlaying(false);
+  //       onPlayNext();
+  //     },
+  //     onpause: () => setIsPlaying(false),
+  //     format: ['mp3']
+  //   }
+  // );
+
+  // useEffect(() => {
+  //   sound?.play();
+    
+  //   return () => {
+  //     sound?.unload();
+  //   }
+  // }, [sound]);
+
+  // const handlePlay = () => {
+  //   if (!isPlaying) {
+  //     play();
+  //   } else {
+  //     pause();
+  //   }
+  // }
 
   useEffect(() => {
-    sound?.play();
-    
-    return () => {
-      sound?.unload();
-    }
-  }, [sound]);
+    audio.volume = volume;
+  }, [volume]);
 
   const handlePlay = () => {
     if (!isPlaying) {
-      play();
+      audio.play();
     } else {
-      pause();
+      audio.pause();
     }
-  }
+    setIsPlaying(!isPlaying); 
+  };
 
+//end
   const toggleMute = () => {
     if (volume === 0) {
       setVolume(1);
@@ -199,6 +220,16 @@ const PlayerContent: React.FC<PlayerContentProps> = ({
             />
           </div>
         </div>
+
+        <AudioPlayer
+        ref={audioRef}
+        src={songUrl}
+        autoPlay={false}
+        volume={volume}
+        onEnded={onPlayNext}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      />
 
       </div>
    );

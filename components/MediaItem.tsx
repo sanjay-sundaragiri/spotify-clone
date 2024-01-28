@@ -16,6 +16,7 @@ const MediaItem:React.FC<MediaItemProps> = ({data,onClick}) => {
     const imageUrl=useLoadImage(data);
 
     const handleClick=()=>{
+        
         if(onClick){
             return onClick(data.id)
         }
@@ -29,7 +30,7 @@ const MediaItem:React.FC<MediaItemProps> = ({data,onClick}) => {
             flex
             items-center
             gap-x-3
-            cursor-pointer
+             cursor-pointer
             hover:bg-neutral-800/50
             w-full
             p-2
